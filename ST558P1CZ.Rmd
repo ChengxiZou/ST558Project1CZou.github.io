@@ -1,0 +1,17 @@
+---
+title: "ST558 Project 1"
+author: "Chengxi Zou"
+date: '2022-06-25'
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Initial Settings
+
+```{r settings, echo=TRUE}
+library(rmarkdown)
+```
+
