@@ -46,9 +46,7 @@ infotbl <- as_tibble(info)
 ```
 
 ```{r}
-c <- GET("https://pokeapi.co/api/v2/berry")
-str(c)
-d <- fromJSON(rawToChar(c$content))
-d
+getberrydata(1)
 ```
+
 
