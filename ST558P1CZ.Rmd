@@ -159,11 +159,9 @@ getpokemondata = function(x){
   b <- fromJSON(rawToChar(a$content))
   pokemoninfo <- data.frame(pokemon.id = b$id,
                             pokemon.name = b$name,
-                            pokemon.order = b$order,
                             pokemon.height = b$height,
                             pokemon.weight = b$weight,
                             base_experience = b$base_experience,
-                            ability.name = b$abilities$ability$name,
                             species.name = b$species$name,
                             pokemon.type = b$types$type$name)
   pokemoninfotbl <- as_tibble(pokemoninfo)
@@ -177,8 +175,8 @@ getpokemoncolordata = function(x){
   fullpath = paste("https://pokeapi.co/api/v2/pokemon-color/", x, sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
-  pokemoncolorinfo <- data.frame(pokemon.id = b$id,
-                            pokemon.name = b$name,
+  pokemoncolorinfo <- data.frame(color.id = b$id,
+                            color.name = b$name,
                             species.name = b$pokemon_species$name)
   pokemoncolorinfotbl <- as_tibble(pokemoncolorinfo)
   return(pokemoncolorinfotbl)
@@ -203,67 +201,66 @@ getpokemonspeciesdata = function(x){
   pokemonspeciesinfotbl <- as_tibble(pokemonspeciesinfo)
   return(pokemonspeciesinfotbl)
 }
-
-getpokemoncolordata(1)
-getpokemondata(2)
-getpokemonspeciesdata(1)
-
-aa<-GET("https://pokeapi.co/api/v2/pokemon-species/1")
-str(aa)
-bb <- fromJSON(rawToChar(aa$content))
-str(bb)
-bbb <- data.frame(bb$id,bb$order,bb$name,bb$habitat$name,bb$capture_rate,bb$base_happiness,bb$gender_rate,bb$color$name,bb$shape$name,bb$is_legendary)
-bbb
-bbbb <- data.frame(bb$moves$move$name)
-bbbb
-
 ```
 
 ## A basic exploratory data analysis
 
-# Pull data from two endpoints: firmness and flavor. Explore the relationship between them.
+# Pull data from two endpoints: pokemoncolor and getpokemon. Explore the relationship between color, weight, length.
 
 ```{r, echo=TRUE}
-firmdata = data.frame()
-for (i in 1:5) {firmdata <- bind_rows(firmdata,getberryfirmdata(i)[,c(2:3)])}
+colordata = data.frame()
+for (i in 1:10) {colordata <- bind_rows(colordata,getpokemoncolordata(i)[,c(2:3)])}
 # now the firmdata object contains all firmness info of berries
 
-flavordata = data.frame()
-for (i in 1:5) {flavordata <- bind_rows(flavordata,getberryflavordata(i)[,c(1:3)])}
+hwdata = data.frame()
+for (i in 1:898) {hwdata <- bind_rows(hwdata,getpokemondata(i)[,c(1:4,6)])}
 # now the flavordata object contains all flavor info of berries
 
-firmdata
-flavordata
-```
-```{r, echo=TRUE}
-# combining them into one data frame in order to do analysis and plot
-joindata <- left_join(firmdata,flavordata)
+colordata
+head(hwdata)
 ```
 
-# Create a new numeric variable: firmness.level to indicate the level of firmness. (from 1 to 5, larger number indicates harder firmness)
+Notice that some species have multiplr types so they were counted multiple times. That make sense.
+
+Combining those two data frame into one in order to do analysis and plot:
 
 ```{r, echo=TRUE}
-for (i in 1:144){
-if (joindata$firmness.name[i] == "very-soft") {joindata$firmness.level[i] = 1}
-if (joindata$firmness.name[i] == "soft") {joindata$firmness.level[i] = 2}
-if (joindata$firmness.name[i] == "hard") {joindata$firmness.level[i] = 3}
-if (joindata$firmness.name[i] == "very-hard") {joindata$firmness.level[i] = 4}
-if (joindata$firmness.name[i] == "super-hard") {joindata$firmness.level[i] = 5}
+joindata <- left_join(colordata,hwdata)
+joindata
+```
+
+# Create a new numeric variable: BMI = weight/(height ^ 2)
+
+```{r, echo=TRUE}
+joindata$BMI = joindata$pokemon.weight/(joindata$pokemon.height * joindata$pokemon.height)
+joindata
+```
+
+Create new variables: BMI.level
+
+```{r, echo=TRUE}
+help("drop_na")
+joindata2 <- drop_na(joindata,c("BMI","pokemon.weight","pokemon.height","pokemon.name","pokemon.id","species.name","color.name"))
+for (i in 1:1340) {
+  if (joindata2$BMI[i] > 10) {joindata2$BMI.level[i] = "strong"}
+  if (joindata2$BMI[i] <= 10) {joindata2$BMI.level[i] = "thin"}
 }
 
-joindata
+joindata2
 ```
 
 # Create some contingency tables
 
+Create a contingency table showing the count of color and BMI level.
+
 ```{r, echo=TRUE}
-table(joindata$berry.name,joindata$flavor.Name,joindata$firmness.name)
+table(joindata2$color.name,joindata2$BMI.level)
 ```
 
 #  Create numerical summaries for some quantitative variables at each setting of some of your categorical variables
 
 ```{r}
-
+summary(joindata)
 ```
 
 
