@@ -236,7 +236,7 @@ joindata$BMI = joindata$pokemon.weight/(joindata$pokemon.height * joindata$pokem
 joindata
 ```
 
-Create new variables: BMI.level
+Create other new variables: BMI.level, height.level, weight.level.
 
 ```{r, echo=TRUE}
 help("drop_na")
@@ -244,6 +244,10 @@ joindata2 <- drop_na(joindata,c("BMI","pokemon.weight","pokemon.height","pokemon
 for (i in 1:1340) {
   if (joindata2$BMI[i] > 10) {joindata2$BMI.level[i] = "strong"}
   if (joindata2$BMI[i] <= 10) {joindata2$BMI.level[i] = "thin"}
+  if (joindata2$pokemon.height[i] > 30) {joindata2$height.level[i] = "tall"}
+  if (joindata2$pokemon.height[i] <= 30) {joindata2$height.level[i] = "short"}
+  if (joindata2$pokemon.weight[i] > 2000) {joindata2$weight.level[i] = "heavy"}
+  if (joindata2$pokemon.weight[i] <= 2000) {joindata2$weight.level[i] = "light"}
 }
 
 joindata2
@@ -257,10 +261,31 @@ Create a contingency table showing the count of color and BMI level.
 table(joindata2$color.name,joindata2$BMI.level)
 ```
 
+Create a contingency table showing the count of height and BMI level.
+
+```{r, echo=TRUE}
+table(joindata2$height.level,joindata2$BMI.level)
+```
+
+Create a contingency table showing the count of weight and BMI level.
+
+```{r, echo=TRUE}
+table(joindata2$weight.level,joindata2$BMI.level)
+```
+
+Create a contingency table showing the count of height and weight.
+
+```{r, echo=TRUE}
+table(joindata2$height.level,joindata2$weight.level)
+```
+
 #  Create numerical summaries for some quantitative variables at each setting of some of your categorical variables
 
 ```{r}
-summary(joindata)
+summary(joindata2)
+summary(joindata2$BMI)
+
+
 ```
 
 
