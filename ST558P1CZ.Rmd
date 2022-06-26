@@ -17,6 +17,7 @@ library(httr)
 library(jsonlite)
 library(tidyverse)
 library(dplyr)
+library(ggplot2)
 ```
 
 ## Reading Data from Pokemon data api
@@ -150,25 +151,142 @@ getmcdata = function(x){
   return(mcinfotbl)
 }
 
-getberryfirmdata(1)
-getberrydata(1)
-getberryflavordata(1)
-getmovedata(1)
-getmadata(3)
-getmcdata(3)
-aa<-GET("https://pokeapi.co/api/v2/move-category/1")
+# search Pokemon
+# endpoint 7: Pokemon
+getpokemondata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  pokemoninfo <- data.frame(pokemon.id = b$id,
+                            pokemon.name = b$name,
+                            pokemon.order = b$order,
+                            pokemon.height = b$height,
+                            pokemon.weight = b$weight,
+                            base_experience = b$base_experience,
+                            ability.name = b$abilities$ability$name,
+                            species.name = b$species$name,
+                            pokemon.type = b$types$type$name)
+  pokemoninfotbl <- as_tibble(pokemoninfo)
+  return(pokemoninfotbl)
+}
+
+
+# search Pokemon Colors
+# endpoint 8: Pokemon Colors
+getpokemoncolordata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon-color/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  pokemoncolorinfo <- data.frame(pokemon.id = b$id,
+                            pokemon.name = b$name,
+                            species.name = b$pokemon_species$name)
+  pokemoncolorinfotbl <- as_tibble(pokemoncolorinfo)
+  return(pokemoncolorinfotbl)
+}
+
+# search Pokemon Species
+# endpoint 8: Pokemon Species
+getpokemonspeciesdata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon-species/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  pokemonspeciesinfo <- data.frame(species.id = b$id,
+                            species.order = b$order,
+                            species.name = bb$name,
+                            habitat.name = b$habitat$name,
+                            capture.rate = b$capture_rate,
+                            base.happiness = b$base_happiness,
+                            gender.rate = b$gender_rate,
+                            color = b$color$name,
+                            shape = b$shape$name,
+                            legendary = b$is_legendary)
+  pokemonspeciesinfotbl <- as_tibble(pokemonspeciesinfo)
+  return(pokemonspeciesinfotbl)
+}
+
+getpokemoncolordata(1)
+getpokemondata(2)
+getpokemonspeciesdata(1)
+
+aa<-GET("https://pokeapi.co/api/v2/pokemon-species/1")
 str(aa)
 bb <- fromJSON(rawToChar(aa$content))
 str(bb)
-bbb <- data.frame(bb$id,bb$name,bb$moves$name,bb$descriptions$description)
-bbbb <- data.frame(bb$names$name)
+bbb <- data.frame(bb$id,bb$order,bb$name,bb$habitat$name,bb$capture_rate,bb$base_happiness,bb$gender_rate,bb$color$name,bb$shape$name,bb$is_legendary)
 bbb
+bbbb <- data.frame(bb$moves$move$name)
 bbbb
 
 ```
 
-```{r}
-getberrydata("jaboca")
+## A basic exploratory data analysis
+
+# Pull data from two endpoints: firmness and flavor. Explore the relationship between them.
+
+```{r, echo=TRUE}
+firmdata = data.frame()
+for (i in 1:5) {firmdata <- bind_rows(firmdata,getberryfirmdata(i)[,c(2:3)])}
+# now the firmdata object contains all firmness info of berries
+
+flavordata = data.frame()
+for (i in 1:5) {flavordata <- bind_rows(flavordata,getberryflavordata(i)[,c(1:3)])}
+# now the flavordata object contains all flavor info of berries
+
+firmdata
+flavordata
+```
+```{r, echo=TRUE}
+# combining them into one data frame in order to do analysis and plot
+joindata <- left_join(firmdata,flavordata)
 ```
 
+# Create a new numeric variable: firmness.level to indicate the level of firmness. (from 1 to 5, larger number indicates harder firmness)
+
+```{r, echo=TRUE}
+for (i in 1:144){
+if (joindata$firmness.name[i] == "very-soft") {joindata$firmness.level[i] = 1}
+if (joindata$firmness.name[i] == "soft") {joindata$firmness.level[i] = 2}
+if (joindata$firmness.name[i] == "hard") {joindata$firmness.level[i] = 3}
+if (joindata$firmness.name[i] == "very-hard") {joindata$firmness.level[i] = 4}
+if (joindata$firmness.name[i] == "super-hard") {joindata$firmness.level[i] = 5}
+}
+
+joindata
+```
+
+# Create some contingency tables
+
+```{r, echo=TRUE}
+table(joindata$berry.name,joindata$flavor.Name,joindata$firmness.name)
+```
+
+#  Create numerical summaries for some quantitative variables at each setting of some of your categorical variables
+
+```{r}
+
+```
+
+
+```{r, echo=TRUE}
+ggplot(crabData, aes(x = color)) +
+geom_bar(aes(fill = y), position = "dodge") +
+xlab("Female Crab Color") +
+scale_fill_discrete(name = "")
+```
+
+
+```{r, echo=TRUE}
+getberrydata(5)
+getberryfirmdata(1)
+getberryflavordata(1)
+
+
+getmadata(1)
+getmcdata(1)
+getmovedata(1)
+
+getpokemoncolordata(1)
+getpokemondata(1)
+getpokemonspeciesdata(1)
+```
 
