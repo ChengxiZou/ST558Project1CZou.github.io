@@ -26,81 +26,149 @@ This is a consumption-only API — only the HTTP GET method is available on reso
 No authentication is required to access this API, and all resources are fully open and available.
 
 ```{r readindata, echo=TRUE}
-# have a section that notes the required packages needed to run the code to create vignette near the top
-library(httr)
-library(jsonlite)
+# the tibble of all berry data
+  allberry <- data.frame()
+  for (i in 1:64) {
+    fullpath = paste(initialpath, i, sep = "")
+    a <- GET(fullpath)
+    b <- fromJSON(rawToChar(a$content))
+    berryinfo <- data.frame(berry.id = b$id,
+                            berry.name = b$name,
+                            max_harvest = b$max_harvest,
+                            growth_time = b$growth_time,
+                            power = b$natural_gift_power,
+                            size = b$size,
+                            smoothness = b$smoothness,
+                            soil_dryness = b$soil_dryness,
+                            firmness.name = b$firmness$name,
+                            flavor.name = b$flavors$flavor$name,
+                            item = b$item,
+                            natural_gift_power= b$natural_gift_power)
+    allberry <- rbind(allberry, berryinfo)
+  }
+  allberryinfotbl <- as_tibble(allberry)
+  allberryinfotbl
 
 initialpath = "https://pokeapi.co/api/v2/berry/"
 
 # search berry data by typing name or id.
+# endpoint 1: berries
 getberrydata = function(x){
   fullpath = paste(initialpath, x, sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
-  berryinfo <- data.frame(id=b$id,name=b$name,max_grown=b$max_harvest,growth_time=b$growth_time,
-                     power=b$natural_gift_power,size=b$size,smoothness=b$smoothness,
-                     SoilDrySpeed=b$soil_dryness,firmness=b$firmness,
-                     flavor.name=b$flavors$flavor$name,flavor.url=b$flavors$flavor$url,
-                     item=b$item,type=b$natural_gift_power)
+  berryinfo <- data.frame(berry.id = b$id,
+                          berry.name = b$name,
+                          max_harvest = b$max_harvest,
+                          growth_time = b$growth_time,
+                          power = b$natural_gift_power,
+                          size = b$size,
+                          smoothness = b$smoothness,
+                          soil_dryness = b$soil_dryness,
+                          firmness.name = b$firmness$name,
+                          flavor.name = b$flavors$flavor$name,
+                          item = b$item,
+                          natural_gift_power= b$natural_gift_power)
 berryinfotbl <- as_tibble(berryinfo)
   return(berryinfotbl)
 }
 
-# search all berry data by typing name or id.
-getallberrydata = function(type){
+# search berry firmness data by typing name or id.
+# endpoint 2: Berry Firmness
+getberryfirmdata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/berry-firmness/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  berryinfo <- data.frame(firmness.id = b$id,
+                          firmness.name = b$name,
+                          berry.name = b$berries$name)
+  berryinfotbl <- as_tibble(berryinfo)
+  return(berryinfotbl)
+}
   
-  allberry <- data.frame()
-  for (i in 1:64) {
-    fullpath = paste(initialpath, i, sep = "")
-    a <- GET(fullpath)
-    b <- fromJSON(rawToChar(a$content))
-    berryinfo <- data.frame(id=b$id,name=b$name,max_grown=b$max_harvest,growth_time=b$growth_time,
-                            power=b$natural_gift_power,size=b$size,smoothness=b$smoothness,
-                            SoilDrySpeed=b$soil_dryness,firmness=b$firmness,
-                            flavor.name=b$flavors$flavor$name,flavor.url=b$flavors$flavor$url,
-                            item=b$item,type=b$natural_gift_power)
-    rbind(allberry, berryinfo)
-  }
-  allberry
-  
-  
-  
-  
-  
-allberryinfotbl <- as_tibble(allberry)
-  return(allberryinfotbl)
+# search berry flavor data by typing name or id.
+# endpoint 3: Berry Flavor
+getberryflavordata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/berry-flavor/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  berryinfo <- data.frame(flavor.id = b$id,
+                          flavor.Name= b$name,
+                          berry.name = b$berries$berry$name,
+                          potency = b$berries$potency,
+                          ct.name = b$contest_type$name)
+  berryinfotbl <- as_tibble(berryinfo)
+  return(berryinfotbl)
 }
 
-allberry
+
+# search Moves
+# endpoint 4: Moves
+getmovedata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/move/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  moveinfo <- data.frame(move.id = b$id,
+                         move.name = b$name,
+                         ct.name = b$contest_type$name,
+                         move.power = b$power,
+                         move.pp = b$pp,
+                         move.priority = b$priority,
+                         move.accuracy = b$accuracy,
+                         target.name = b$target$name,
+                         damage.class = b$damage_class$name,
+                         generation.name = b$generation$name)
+  moveinfotbl <- as_tibble(moveinfo)
+  return(moveinfotbl)
+}
+
+# search Move Ailments
+# endpoint 5: Move Ailments
+getmadata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/move-ailment/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  mainfo <- data.frame(ailment.id = b$id,
+                       ailment.name = b$name,
+                       move.name = b$moves$name
+                       )
+  mainfotbl <- as_tibble(mainfo)
+  return(mainfotbl)
+}
+
+# search Move Categories
+# endpoint 6: Move Categories
+getmcdata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/move-category/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  mcinfo <- data.frame(category.id = b$id,
+                       category.name = b$name,
+                       move.name = b$moves$name,
+                       description = b$descriptions$description)
+  mcinfotbl <- as_tibble(mcinfo)
+  return(mcinfotbl)
+}
+
+getberryfirmdata(1)
+getberrydata(1)
+getberryflavordata(1)
+getmovedata(1)
+getmadata(3)
+getmcdata(3)
+aa<-GET("https://pokeapi.co/api/v2/move-category/1")
+str(aa)
+bb <- fromJSON(rawToChar(aa$content))
+str(bb)
+bbb <- data.frame(bb$id,bb$name,bb$moves$name,bb$descriptions$description)
+bbbb <- data.frame(bb$names$name)
+bbb
+bbbb
+
 ```
 
 ```{r}
 getberrydata("jaboca")
-
-  allberry <- data.frame()
-  for (i in 1:64) {
-    fullpath = paste(initialpath, i, sep = "")
-    a <- GET(fullpath)
-    b <- fromJSON(rawToChar(a$content))
-    berryinfo <- data.frame(id=b$id,name=b$name,max_grown=b$max_harvest,growth_time=b$growth_time,
-                            power=b$natural_gift_power,size=b$size,smoothness=b$smoothness,
-                            SoilDrySpeed=b$soil_dryness,firmness=b$firmness,
-                            flavor.name=b$flavors$flavor$name,flavor.url=b$flavors$flavor$url,
-                            item=b$item,type=b$natural_gift_power)
-    rbind(allberry, berryinfo)
-  }
-  allberry
-  
-for (i in 1:64) {
-fullpath = paste(initialpath,2, sep = "")
-fullpath
-}
-  
-for (i in 1:64) {
-print(i)
-}
-  a=1
-  a
 ```
 
 
