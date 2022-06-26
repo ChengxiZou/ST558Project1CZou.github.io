@@ -9,7 +9,7 @@ output: github_document
 knitr::opts_chunk$set(echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE)
 ```
 
-## Initial Settings
+# Initial Settings
 
 ```{r settings, echo=TRUE}
 # have a section that notes the required packages needed to run the code to create vignette near the top
@@ -20,7 +20,7 @@ library(dplyr)
 library(ggplot2)
 ```
 
-## Reading Data from Pokemon data api
+# Reading Data from Pokemon data api
 
 This is a consumption-only API — only the HTTP GET method is available on resources.
 
@@ -203,9 +203,9 @@ getpokemonspeciesdata = function(x){
 }
 ```
 
-## A basic exploratory data analysis
+# A basic exploratory data analysis
 
-# Pull data from two endpoints: pokemoncolor and getpokemon. Explore the relationship between color, weight, length.
+## Pull data from two endpoints: pokemoncolor and getpokemon. Explore the relationship between color, weight, length.
 
 ```{r, echo=TRUE}
 colordata = data.frame()
@@ -229,7 +229,7 @@ joindata <- left_join(colordata,hwdata)
 joindata
 ```
 
-# Create a new numeric variable: BMI = weight/(height ^ 2)
+## Create a new numeric variable: BMI = weight/(height ^ 2)
 
 ```{r, echo=TRUE}
 joindata$BMI = joindata$pokemon.weight/(joindata$pokemon.height * joindata$pokemon.height)
@@ -253,7 +253,7 @@ for (i in 1:1340) {
 joindata2
 ```
 
-# Create some contingency tables
+## Create some contingency tables
 
 Create a contingency table showing the count of color and BMI level.
 
@@ -279,15 +279,57 @@ Create a contingency table showing the count of height and weight.
 table(joindata2$height.level,joindata2$weight.level)
 ```
 
-#  Create numerical summaries for some quantitative variables at each setting of some of your categorical variables
+##  Create numerical summaries for some quantitative variables at each setting of some of your categorical variables
+
+Summary of the joined data object.
 
 ```{r}
 summary(joindata2)
-summary(joindata2$BMI)
-
-
 ```
 
+Let's see how BMI behaves at each settings of color.
+
+```{r}
+joindata2 %>% group_by(color.name) %>% summarise(Min = min(BMI), Median = median(BMI),
+                                                 Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
+```
+
+Let's see how BMI behaves at each settings of BMI level.
+
+```{r}
+joindata2 %>% group_by(BMI.level) %>% summarise(Min = min(BMI), Median = median(BMI),
+                                                 Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
+```
+
+Let's see how BMI behaves at each settings of height level.
+
+```{r}
+joindata2 %>% group_by(height.level) %>% summarise(Min = min(BMI), Median = median(BMI),
+                                                 Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
+```
+
+Let's see how BMI behaves at each settings of weight level.
+
+```{r}
+joindata2 %>% group_by(weight.level) %>% summarise(Min = min(BMI), Median = median(BMI),
+                                                 Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
+```
+
+Let's see how height behaves at each settings of BMI level.
+
+```{r}
+joindata2 %>% group_by(BMI.level) %>% summarise(Min = min(pokemon.height), Median = median(pokemon.height),
+                                                 Mean = mean(pokemon.height), Max = max(pokemon.height), IQR = IQR(pokemon.height))
+```
+
+Let's see how weight behaves at each settings of BMI level.
+
+```{r}
+joindata2 %>% group_by(BMI.level) %>% summarise(Min = min(pokemon.weight), Median = median(pokemon.weight),
+                                                 Mean = mean(pokemon.weight), Max = max(pokemon.height), IQR = IQR(pokemon.weight))
+```
+
+## Create plots.
 
 ```{r, echo=TRUE}
 ggplot(crabData, aes(x = color)) +
