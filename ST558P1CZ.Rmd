@@ -16,12 +16,6 @@ knitr::opts_chunk$set(echo = FALSE, eval = TRUE, message = FALSE, warning = FALS
 library(httr)
 library(jsonlite)
 library(tidyverse)
-a <- GET("https://api.spoonacular.com/food/ingredients/{id}/information")
-str(a,max.level = 1)
-a
-
-b <- fromJSON(rawToChar(a$content))
-str(b,max.level = 1)
 ```
 
 ## Reading Data from Pokemon data api
@@ -52,6 +46,9 @@ infotbl <- as_tibble(info)
 ```
 
 ```{r}
-
+c <- GET("https://pokeapi.co/api/v2/berry")
+str(c)
+d <- fromJSON(rawToChar(c$content))
+d
 ```
 
