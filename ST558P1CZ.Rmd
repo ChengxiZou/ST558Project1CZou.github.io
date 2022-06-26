@@ -12,6 +12,46 @@ knitr::opts_chunk$set(echo = FALSE, eval = TRUE, message = FALSE, warning = FALS
 ## Initial Settings
 
 ```{r settings, echo=TRUE}
-library(rmarkdown)
+# have a section that notes the required packages needed to run the code to create vignette near the top
+library(httr)
+library(jsonlite)
+library(tidyverse)
+a <- GET("https://api.spoonacular.com/food/ingredients/{id}/information")
+str(a,max.level = 1)
+a
+
+b <- fromJSON(rawToChar(a$content))
+str(b,max.level = 1)
+```
+
+## Reading Data from Pokemon data api
+
+This is a consumption-only API — only the HTTP GET method is available on resources.
+
+No authentication is required to access this API, and all resources are fully open and available.
+
+```{r readindata, echo=TRUE}
+# have a section that notes the required packages needed to run the code to create vignette near the top
+library(httr)
+library(jsonlite)
+
+initialpath = "https://pokeapi.co/api/v2/berry/"
+
+getberrydata = function(x){
+  fullpath = paste(initialpath, x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  info <- data.frame(id=b$id,name=b$name,max_grown=b$max_harvest,growth_time=b$growth_time,
+                     power=b$natural_gift_power,size=b$size,smoothness=b$smoothness,
+                     SoilDrySpeed=b$soil_dryness,firmness=b$firmness,
+                     flavor.name=b$flavors$flavor$name,flavor.url=b$flavors$flavor$url,
+                     item=b$item,type=b$natural_gift_power)
+infotbl <- as_tibble(info)
+  return(infotbl)
+}
+```
+
+```{r}
+
 ```
 
