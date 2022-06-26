@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = FALSE, eval = TRUE, message = FALSE, warning = FALS
 library(httr)
 library(jsonlite)
 library(tidyverse)
+library(dplyr)
 ```
 
 ## Reading Data from Pokemon data api
@@ -31,22 +32,75 @@ library(jsonlite)
 
 initialpath = "https://pokeapi.co/api/v2/berry/"
 
+# search berry data by typing name or id.
 getberrydata = function(x){
   fullpath = paste(initialpath, x, sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
-  info <- data.frame(id=b$id,name=b$name,max_grown=b$max_harvest,growth_time=b$growth_time,
+  berryinfo <- data.frame(id=b$id,name=b$name,max_grown=b$max_harvest,growth_time=b$growth_time,
                      power=b$natural_gift_power,size=b$size,smoothness=b$smoothness,
                      SoilDrySpeed=b$soil_dryness,firmness=b$firmness,
                      flavor.name=b$flavors$flavor$name,flavor.url=b$flavors$flavor$url,
                      item=b$item,type=b$natural_gift_power)
-infotbl <- as_tibble(info)
-  return(infotbl)
+berryinfotbl <- as_tibble(berryinfo)
+  return(berryinfotbl)
 }
+
+# search all berry data by typing name or id.
+getallberrydata = function(type){
+  
+  allberry <- data.frame()
+  for (i in 1:64) {
+    fullpath = paste(initialpath, i, sep = "")
+    a <- GET(fullpath)
+    b <- fromJSON(rawToChar(a$content))
+    berryinfo <- data.frame(id=b$id,name=b$name,max_grown=b$max_harvest,growth_time=b$growth_time,
+                            power=b$natural_gift_power,size=b$size,smoothness=b$smoothness,
+                            SoilDrySpeed=b$soil_dryness,firmness=b$firmness,
+                            flavor.name=b$flavors$flavor$name,flavor.url=b$flavors$flavor$url,
+                            item=b$item,type=b$natural_gift_power)
+    rbind(allberry, berryinfo)
+  }
+  allberry
+  
+  
+  
+  
+  
+allberryinfotbl <- as_tibble(allberry)
+  return(allberryinfotbl)
+}
+
+allberry
 ```
 
 ```{r}
-getberrydata(1)
+getberrydata("jaboca")
+
+  allberry <- data.frame()
+  for (i in 1:64) {
+    fullpath = paste(initialpath, i, sep = "")
+    a <- GET(fullpath)
+    b <- fromJSON(rawToChar(a$content))
+    berryinfo <- data.frame(id=b$id,name=b$name,max_grown=b$max_harvest,growth_time=b$growth_time,
+                            power=b$natural_gift_power,size=b$size,smoothness=b$smoothness,
+                            SoilDrySpeed=b$soil_dryness,firmness=b$firmness,
+                            flavor.name=b$flavors$flavor$name,flavor.url=b$flavors$flavor$url,
+                            item=b$item,type=b$natural_gift_power)
+    rbind(allberry, berryinfo)
+  }
+  allberry
+  
+for (i in 1:64) {
+fullpath = paste(initialpath,2, sep = "")
+fullpath
+}
+  
+for (i in 1:64) {
+print(i)
+}
+  a=1
+  a
 ```
 
 
