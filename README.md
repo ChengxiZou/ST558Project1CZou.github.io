@@ -610,7 +610,7 @@ ggplot(joindata2, aes(x = BMI, y = color.name)) + ylab("color") +
 geom_boxplot(aes(color = color.name)) + ggtitle("Box Plot of BMI level counts through color") + coord_flip()
 ```
 
-![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](unnamed-chunk-440-1.png)<!-- -->
 
 All the distributions seem to be right-skewed, which means there exist
 outliers with huge BMIs, especially among black, blue, brown, grey,
