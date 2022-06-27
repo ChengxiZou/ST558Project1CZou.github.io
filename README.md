@@ -26,7 +26,15 @@ There are lots of data from the pokemon api, pokemons are species that
 helps you in a battle, and they can eat different kinds of berries to
 gain health, strength, etc.
 
-Let’s grab some berry data by creating query functions using GET:
+Let’s grab some berry data by creating query functions using GET.
+
+Notice that I use tolower(x) in the function. It convert letters to
+lower case so the path would be right even if users used upper case.
+This is good **use-ability**. If input ID numbers, it still works fine.
+
+There is no abbreviation of berries or pokemons, every one of them has a
+simple and unique ID and a name, so the tolower(x) function is all that
+I’ve done for the **use-ability**.
 
 ``` r
 initialpath = "https://pokeapi.co/api/v2/berry/"
@@ -34,7 +42,7 @@ initialpath = "https://pokeapi.co/api/v2/berry/"
 # search berry data by typing name or id.
 # endpoint 1: berries
 getberrydata = function(x){
-  fullpath = paste(initialpath, x, sep = "")
+  fullpath = paste(initialpath, tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   berryinfo <- data.frame(berry.id = b$id,
@@ -108,7 +116,7 @@ by simply typing the berry name or ID.
 # search berry firmness data by typing name or id.
 # endpoint 2: Berry Firmness
 getberryfirmdata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/berry-firmness/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/berry-firmness/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   berryinfo <- data.frame(firmness.id = b$id,
@@ -128,7 +136,7 @@ by simply typing the berry name or ID.
 # search berry flavor data by typing name or id.
 # endpoint 3: Berry Flavor
 getberryflavordata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/berry-flavor/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/berry-flavor/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   berryinfo <- data.frame(flavor.id = b$id,
@@ -151,7 +159,7 @@ typing the move name or ID.
 # search Moves
 # endpoint 4: Moves
 getmovedata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/move/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/move/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   moveinfo <- data.frame(move.id = b$id,
@@ -178,7 +186,7 @@ typing the ailment’s name or ID.
 # search Move Ailments
 # endpoint 5: Move Ailments
 getmadata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/move-ailment/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/move-ailment/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   mainfo <- data.frame(ailment.id = b$id,
@@ -199,7 +207,7 @@ typing the category name or ID.
 # search Move Categories
 # endpoint 6: Move Categories
 getmcdata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/move-category/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/move-category/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   mcinfo <- data.frame(category.id = b$id,
@@ -221,7 +229,7 @@ typing the pokemon’s name or ID.
 # search Pokemon
 # endpoint 7: Pokemon
 getpokemondata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/pokemon/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   pokemoninfo <- data.frame(pokemon.id = b$id,
@@ -245,7 +253,7 @@ simply typing the color name or ID.
 # search Pokemon Colors
 # endpoint 8: Pokemon Colors
 getpokemoncolordata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/pokemon-color/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon-color/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   pokemoncolorinfo <- data.frame(color.id = b$id,
@@ -265,7 +273,7 @@ simply typing the species name or ID.
 # search Pokemon Species
 # endpoint 8: Pokemon Species
 getpokemonspeciesdata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/pokemon-species/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon-species/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   pokemonspeciesinfo <- data.frame(species.id = b$id,
@@ -281,6 +289,45 @@ getpokemonspeciesdata = function(x){
   pokemonspeciesinfotbl <- as_tibble(pokemonspeciesinfo)
   return(pokemonspeciesinfotbl)
 }
+```
+
+**Now let’s try to write an overall function that allow users to ask for
+info in a single function.**
+
+**Good User-ability!**
+
+Just type the endpoint and the ID or name then you get the data.
+
+``` r
+GetPokemonApiData = function(endpoint, x){
+  endpoint2 <- tolower(endpoint)
+  switch(endpoint2,
+         "berry" = getberrydata(x),
+         "berry-firmness" = getberryfirmdata(x),
+         "berry-flavor" = getberryflavordata(x),
+         "move" = getmovedata(x),
+         "move-ailment" = getmadata(x),
+         "move-category" = getmcdata(x),
+         "pokemon" = getpokemondata(x),
+         "pokemon-color" = getpokemoncolordata(x)
+         )
+}
+
+GetPokemonApiData("Berry",1)
+```
+
+    ## # A tibble: 5 x 13
+    ##   berry.id berry.name max_harvest growth_time power  size smoothness soil_dryness firmness.name flavor.name item.name   item.url          
+    ##      <int> <chr>            <int>       <int> <int> <int>      <int>        <int> <chr>         <chr>       <chr>       <chr>             
+    ## 1        1 cheri                5           3    60    20         25           15 soft          spicy       cheri-berry https://pokeapi.c~
+    ## 2        1 cheri                5           3    60    20         25           15 soft          dry         cheri-berry https://pokeapi.c~
+    ## 3        1 cheri                5           3    60    20         25           15 soft          sweet       cheri-berry https://pokeapi.c~
+    ## 4        1 cheri                5           3    60    20         25           15 soft          bitter      cheri-berry https://pokeapi.c~
+    ## 5        1 cheri                5           3    60    20         25           15 soft          sour        cheri-berry https://pokeapi.c~
+    ## # ... with 1 more variable: natural_gift_power <int>
+
+``` r
+# it works!
 ```
 
 # A basic exploratory data analysis
@@ -619,7 +666,7 @@ geom_point(aes(color = color.name), position = "jitter") + scale_color_discrete(
   ggtitle("Jitter Plot of BMI level counts through color") + xlab("color")
 ```
 
-![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-59-1.png)<!-- -->
 
 We can see that the majority of polemons have the BMI value under 10.
 There are no pink pokemon whose BMI is larger than 10.
@@ -635,7 +682,7 @@ geom_point(aes(color = factor(color.name))) + scale_color_discrete(name = "color
   ggtitle("Scatter plot of weight and height.") + geom_smooth(method = 'lm')
 ```
 
-![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-60-1.png)<!-- -->
 
 In general, the pokemon with larger weight would have larger height, but
 there is no clear linear relationship between them since we could see
@@ -649,7 +696,7 @@ geom_point(aes(color = factor(color.name))) + scale_color_discrete(name = "color
   ggtitle("Scatter plot of height and BMI.") + geom_smooth(method = 'lm')
 ```
 
-![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-61-1.png)<!-- -->
 
 Although the plot shows a down-ward linear regression model, there is
 absolutely no clear or convincing linear model to describe the
@@ -664,7 +711,7 @@ geom_bar(aes(fill = color.name), position = "dodge") +
 scale_fill_discrete(name = "color") + ggtitle("Histogram Plot of BMI level counts through color")
 ```
 
-![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-62-1.png)<!-- -->
 
 We can see that the number of thin blue pokemons is the biggest among
 other thin pokemons. The number of strong grey pokemons is the biggest
@@ -677,7 +724,7 @@ ggplot(joindata2, aes(x = BMI, y = color.name)) + ylab("color") +
 geom_boxplot(aes(color = color.name)) + ggtitle("Box Plot of BMI level counts through color") + coord_flip()
 ```
 
-![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-63-1.png)<!-- -->
 
 All the distributions seem to be right-skewed, which means there exist
 outliers with huge BMIs, especially among black, blue, brown, grey,
