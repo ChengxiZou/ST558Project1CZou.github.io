@@ -239,11 +239,20 @@ joindata
 Create other new variables: BMI.level, height.level, weight.level.
 
 ```{r, echo=TRUE}
-help("drop_na")
+# drop the na value in the data
 joindata2 <- drop_na(joindata,c("BMI","pokemon.weight","pokemon.height","pokemon.name","pokemon.id","species.name","color.name"))
-for (i in 1:1340) {
-  if (joindata2$BMI[i] > 10) {joindata2$BMI.level[i] = "strong"}
-  if (joindata2$BMI[i] <= 10) {joindata2$BMI.level[i] = "thin"}
+
+# let's see how the BMI looks like.
+arrangebmi <- joindata2 %>% arrange(desc(BMI))
+arrangebmi
+
+# this "cosmoem" has an extremly high BMI, better exclude it in order to do better analysis.
+joindata2 <- arrangebmi[-1,]
+
+# Create other new variables: BMI.level, height.level, weight.level since the original data is not suitable to generate contingency tables and plots.
+for (i in 1:1339) {
+  if (joindata2$BMI[i] > 5) {joindata2$BMI.level[i] = "strong"}
+  if (joindata2$BMI[i] <= 5) {joindata2$BMI.level[i] = "thin"}
   if (joindata2$pokemon.height[i] > 30) {joindata2$height.level[i] = "tall"}
   if (joindata2$pokemon.height[i] <= 30) {joindata2$height.level[i] = "short"}
   if (joindata2$pokemon.weight[i] > 2000) {joindata2$weight.level[i] = "heavy"}
@@ -331,26 +340,42 @@ joindata2 %>% group_by(BMI.level) %>% summarise(Min = min(pokemon.weight), Media
 
 ## Create plots.
 
+Generate a jitter plot of BMI level counts through color.
+
 ```{r, echo=TRUE}
-ggplot(crabData, aes(x = color)) +
-geom_bar(aes(fill = y), position = "dodge") +
-xlab("Female Crab Color") +
-scale_fill_discrete(name = "")
+ggplot(joindata2, aes(x = color.name, BMI)) +
+geom_point(aes(color = color.name), position = "jitter") + scale_color_discrete(name = "color") +
+  ggtitle("Jitter Plot of BMI level counts through color") + xlab("color")
 ```
 
+Generate a scatter plot of weight and height.
 
 ```{r, echo=TRUE}
-getberrydata(5)
-getberryfirmdata(1)
-getberryflavordata(1)
+ggplot(joindata2, aes(pokemon.weight, pokemon.height)) +
+geom_point(aes(color = factor(color.name))) + scale_color_discrete(name = "color") +
+  ggtitle("Scatter plot of weight and height.") + geom_smooth(method = 'lm')
+```
 
+Generate a scatter plot of height and BMI.
 
-getmadata(1)
-getmcdata(1)
-getmovedata(1)
+```{r, echo=TRUE}
+ggplot(joindata2, aes(pokemon.height, BMI)) +
+geom_point(aes(color = factor(color.name))) + scale_color_discrete(name = "color") +
+  ggtitle("Scatter plot of height and BMI.") + geom_smooth(method = 'lm')
+```
 
-getpokemoncolordata(1)
-getpokemondata(1)
-getpokemonspeciesdata(1)
+Generate a histogram of BMI level counts through color.
+
+```{r}
+ggplot(joindata2, aes(x = BMI.level)) +
+geom_bar(aes(fill = color.name), position = "dodge") +
+scale_fill_discrete(name = "color") + ggtitle("Histogram Plot of BMI level counts through color")
+```
+
+Generate a box plot of BMI through color.
+
+```{r}
+ggplot(joindata2, aes(x = BMI, y = color.name)) + ylab("color") +
+geom_boxplot(aes(color = color.name)) + ggtitle("Box Plot of BMI level counts through color") + coord_flip()
 ```
 
