@@ -1,0 +1,430 @@
+---
+title: "ST558 Project 1"
+author: "Chengxi Zou"
+date: '2022-06-25'
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Initial Settings
+
+```{r settings, echo=TRUE}
+# have a section that notes the required packages needed to run the code to create vignette near the top
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+# Reading Data from Pokemon data api
+
+This is a consumption-only API — only the HTTP GET method is available on resources.
+
+No authentication is required to access this API, and all resources are fully open and available.
+
+```{r readindata, echo=TRUE}
+# the tibble of all berry data
+  allberry <- data.frame()
+  for (i in 1:64) {
+    fullpath = paste(initialpath, i, sep = "")
+    a <- GET(fullpath)
+    b <- fromJSON(rawToChar(a$content))
+    berryinfo <- data.frame(berry.id = b$id,
+                            berry.name = b$name,
+                            max_harvest = b$max_harvest,
+                            growth_time = b$growth_time,
+                            power = b$natural_gift_power,
+                            size = b$size,
+                            smoothness = b$smoothness,
+                            soil_dryness = b$soil_dryness,
+                            firmness.name = b$firmness$name,
+                            flavor.name = b$flavors$flavor$name,
+                            item = b$item,
+                            natural_gift_power= b$natural_gift_power)
+    allberry <- rbind(allberry, berryinfo)
+  }
+  allberryinfotbl <- as_tibble(allberry)
+  allberryinfotbl
+
+initialpath = "https://pokeapi.co/api/v2/berry/"
+
+# search berry data by typing name or id.
+# endpoint 1: berries
+getberrydata = function(x){
+  fullpath = paste(initialpath, x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  berryinfo <- data.frame(berry.id = b$id,
+                          berry.name = b$name,
+                          max_harvest = b$max_harvest,
+                          growth_time = b$growth_time,
+                          power = b$natural_gift_power,
+                          size = b$size,
+                          smoothness = b$smoothness,
+                          soil_dryness = b$soil_dryness,
+                          firmness.name = b$firmness$name,
+                          flavor.name = b$flavors$flavor$name,
+                          item = b$item,
+                          natural_gift_power= b$natural_gift_power)
+berryinfotbl <- as_tibble(berryinfo)
+  return(berryinfotbl)
+}
+
+# search berry firmness data by typing name or id.
+# endpoint 2: Berry Firmness
+getberryfirmdata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/berry-firmness/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  berryinfo <- data.frame(firmness.id = b$id,
+                          firmness.name = b$name,
+                          berry.name = b$berries$name)
+  berryinfotbl <- as_tibble(berryinfo)
+  return(berryinfotbl)
+}
+  
+# search berry flavor data by typing name or id.
+# endpoint 3: Berry Flavor
+getberryflavordata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/berry-flavor/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  berryinfo <- data.frame(flavor.id = b$id,
+                          flavor.Name= b$name,
+                          berry.name = b$berries$berry$name,
+                          potency = b$berries$potency,
+                          ct.name = b$contest_type$name)
+  berryinfotbl <- as_tibble(berryinfo)
+  return(berryinfotbl)
+}
+
+
+# search Moves
+# endpoint 4: Moves
+getmovedata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/move/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  moveinfo <- data.frame(move.id = b$id,
+                         move.name = b$name,
+                         ct.name = b$contest_type$name,
+                         move.power = b$power,
+                         move.pp = b$pp,
+                         move.priority = b$priority,
+                         move.accuracy = b$accuracy,
+                         target.name = b$target$name,
+                         damage.class = b$damage_class$name,
+                         generation.name = b$generation$name)
+  moveinfotbl <- as_tibble(moveinfo)
+  return(moveinfotbl)
+}
+
+# search Move Ailments
+# endpoint 5: Move Ailments
+getmadata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/move-ailment/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  mainfo <- data.frame(ailment.id = b$id,
+                       ailment.name = b$name,
+                       move.name = b$moves$name
+                       )
+  mainfotbl <- as_tibble(mainfo)
+  return(mainfotbl)
+}
+
+# search Move Categories
+# endpoint 6: Move Categories
+getmcdata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/move-category/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  mcinfo <- data.frame(category.id = b$id,
+                       category.name = b$name,
+                       move.name = b$moves$name,
+                       description = b$descriptions$description)
+  mcinfotbl <- as_tibble(mcinfo)
+  return(mcinfotbl)
+}
+
+# search Pokemon
+# endpoint 7: Pokemon
+getpokemondata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  pokemoninfo <- data.frame(pokemon.id = b$id,
+                            pokemon.name = b$name,
+                            pokemon.height = b$height,
+                            pokemon.weight = b$weight,
+                            base_experience = b$base_experience,
+                            species.name = b$species$name,
+                            pokemon.type = b$types$type$name)
+  pokemoninfotbl <- as_tibble(pokemoninfo)
+  return(pokemoninfotbl)
+}
+
+
+# search Pokemon Colors
+# endpoint 8: Pokemon Colors
+getpokemoncolordata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon-color/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  pokemoncolorinfo <- data.frame(color.id = b$id,
+                            color.name = b$name,
+                            species.name = b$pokemon_species$name)
+  pokemoncolorinfotbl <- as_tibble(pokemoncolorinfo)
+  return(pokemoncolorinfotbl)
+}
+
+# search Pokemon Species
+# endpoint 8: Pokemon Species
+getpokemonspeciesdata = function(x){
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon-species/", x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  pokemonspeciesinfo <- data.frame(species.id = b$id,
+                            species.order = b$order,
+                            species.name = bb$name,
+                            habitat.name = b$habitat$name,
+                            capture.rate = b$capture_rate,
+                            base.happiness = b$base_happiness,
+                            gender.rate = b$gender_rate,
+                            color = b$color$name,
+                            shape = b$shape$name,
+                            legendary = b$is_legendary)
+  pokemonspeciesinfotbl <- as_tibble(pokemonspeciesinfo)
+  return(pokemonspeciesinfotbl)
+}
+```
+
+# A basic exploratory data analysis
+
+## Pull data from two endpoints: pokemoncolor and getpokemon. Explore the relationship between color, weight, length.
+
+```{r, echo=TRUE}
+colordata = data.frame()
+for (i in 1:10) {colordata <- bind_rows(colordata,getpokemoncolordata(i)[,c(2:3)])}
+# now the firmdata object contains all firmness info of berries
+
+hwdata = data.frame()
+for (i in 1:898) {hwdata <- bind_rows(hwdata,getpokemondata(i)[,c(1:4,6)])}
+# now the flavordata object contains all flavor info of berries
+
+# look at first 6 rows of those two data to get a feeling of the structure.
+head(colordata)
+head(hwdata)
+```
+
+Notice that some species have multiplr types so they were counted multiple times. That makes sense.
+
+Combining those two data frame into one in order to do analysis and plot:
+
+```{r, echo=TRUE}
+joindata <- left_join(colordata,hwdata)
+
+# inspect its structure.
+as.tibble(head(joindata))
+```
+
+## Create a new numeric variable: BMI = weight/(height ^ 2)
+
+BMI is a statistic to determine whether a pokemon is strong or thin.
+
+```{r, echo=TRUE}
+joindata$BMI = joindata$pokemon.weight/(joindata$pokemon.height * joindata$pokemon.height)
+as.tibble(head(joindata))
+```
+
+Create other new variables: BMI.level, height.level and weight.level.
+
+I created those categorical variables to determine whether they are tall or short, heavy or light, etc.
+
+Since they are different species from human, I choose 5 to be the BMI boundary after inspecting the joined data.
+
+```{r, echo=TRUE}
+# drop the na value in the data
+joindata2 <- drop_na(joindata,c("BMI","pokemon.weight","pokemon.height","pokemon.name","pokemon.id","species.name","color.name"))
+
+# let's see how the BMI looks like.
+arrangebmi <- joindata2 %>% arrange(desc(BMI))
+as.tibble(head(arrangebmi))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# this "cosmoem" has an extremly high BMI, better exclude it in order to do better analysis.
+joindata2 <- arrangebmi[-1,]
+
+# Create other new variables: BMI.level, height.level, weight.level since the original data is not suitable to generate contingency tables and plots.
+for (i in 1:1339) {
+  if (joindata2$BMI[i] > 5) {joindata2$BMI.level[i] = "strong"}
+  if (joindata2$BMI[i] <= 5) {joindata2$BMI.level[i] = "thin"}
+  if (joindata2$pokemon.height[i] > 30) {joindata2$height.level[i] = "tall"}
+  if (joindata2$pokemon.height[i] <= 30) {joindata2$height.level[i] = "short"}
+  if (joindata2$pokemon.weight[i] > 2000) {joindata2$weight.level[i] = "heavy"}
+  if (joindata2$pokemon.weight[i] <= 2000) {joindata2$weight.level[i] = "light"}
+}
+
+as.tibble(head(joindata2))
+```
+
+## Create some contingency tables
+
+**1. Create a contingency table showing the count of BMI level.**
+
+```{r, echo=TRUE}
+table(joindata2$BMI.level)
+```
+
+We can see that if we set the BMI boundary to be 5, there would be 242 strong pokemons and 1097 thin pokemons.
+
+**2. Create a contingency table showing the count of color and BMI level.**
+
+```{r, echo=TRUE}
+table(joindata2$color.name,joindata2$BMI.level)
+```
+
+We can see that whether pokemons are strong or thin doesn't depend on the color much.
+
+**3. Create a contingency table showing the count between color and weight level.**
+
+```{r, echo=TRUE}
+table(joindata2$weight.level,joindata2$color.name)
+```
+
+We can see that there is no heavy pink pokemons or heavy yellow pokemons.
+
+**4. Create a contingency table showing the count of height and weight.**
+
+```{r, echo=TRUE}
+table(joindata2$height.level,joindata2$weight.level)
+```
+
+We can see that the majority of pokemons are light and short.
+
+##  Create numerical summaries for some quantitative variables at each setting of some of your categorical variables
+
+**Summary of the joined data object.**
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+summary(joindata2)
+```
+
+There are 1339 pokemons when excluding the data with NA and extrem outliers. Notice that some species have multiple types.
+
+There are pokemons weigh more than 9000, however if you look at the data, this situation is not rare.
+
+**Summary of BMI at each settings of color**
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+joindata2 %>% group_by(color.name) %>% summarise(Min = min(BMI), Median = median(BMI),
+                                                 Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
+```
+
+The heaviest pokemon is brown, the lightest pokemon is purple.
+
+Pink pokemons are the lightest polemons among all the other color.
+
+**Summary of BMI at each settings of BMI level**
+
+Let's see how BMI behaves at each settings of BMI level.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+joindata2 %>% group_by(BMI.level) %>% summarise(Min = min(BMI), Median = median(BMI),
+                                                 Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
+```
+
+The strong pokemons have the mean BMI of 10.81, while the thin pokemons have the mean BMI of 2.53.
+
+**Summary of BMI at each settings of height level**
+
+Let's see how BMI behaves at each settings of height level.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+joindata2 %>% group_by(height.level) %>% summarise(Min = min(BMI), Median = median(BMI),
+                                                 Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
+```
+
+The short pokemons have the mean BMI of 4.13, while the tall pokemons have the mean BMI of 1.51.
+
+**Summary of BMI at each settings of weight level**
+
+Let's see how BMI behaves at each settings of weight level.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+joindata2 %>% group_by(weight.level) %>% summarise(Min = min(BMI), Median = median(BMI),
+                                                 Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
+```
+
+The heavy pokemons have the mean BMI of 5.55, while the light pokemons have the mean BMI of 3.89.
+
+**Summary of weight at each settings of BMI level**
+
+Let's see how weight behaves at each settings of BMI level.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+joindata2 %>% group_by(BMI.level) %>% summarise(Min = min(pokemon.weight), Median = median(pokemon.weight),
+                                                 Mean = mean(pokemon.weight), Max = max(pokemon.height), IQR = IQR(pokemon.weight))
+```
+
+The strong pokemons have the mean weight of 1176.32, while the thin pokemons have the mean weight of 549.24.
+
+## Create plots.
+
+**Generate a jitter plot of BMI level counts through color.**
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ggplot(joindata2, aes(x = color.name, BMI)) +
+geom_point(aes(color = color.name), position = "jitter") + scale_color_discrete(name = "color") +
+  ggtitle("Jitter Plot of BMI level counts through color") + xlab("color")
+```
+
+We can see that the majority of polemons have the BMI value under 10. There are no pink pokemon whose BMI is larger than 10.
+
+The pokemons who have large BMI tend to have color of blue, brown, grey or green.
+
+**Generate a scatter plot of weight and height.**
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ggplot(joindata2, aes(pokemon.weight, pokemon.height)) +
+geom_point(aes(color = factor(color.name))) + scale_color_discrete(name = "color") +
+  ggtitle("Scatter plot of weight and height.") + geom_smooth(method = 'lm')
+```
+
+In general, the pokemon with larger weight would have larger height, but there is no clear linear relationship between them since we could see that the variance are huge.
+
+**Generate a scatter plot of height and BMI.**
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ggplot(joindata2, aes(pokemon.height, BMI)) +
+geom_point(aes(color = factor(color.name))) + scale_color_discrete(name = "color") +
+  ggtitle("Scatter plot of height and BMI.") + geom_smooth(method = 'lm')
+```
+
+Although the plot shows a down-ward linear regression model, there is absolutely no clear or convincing linear model to describe the relationship between height and BMI since the data points spread with huge variance and without a clear trend.
+
+**Generate a histogram of BMI level counts through color.**
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ggplot(joindata2, aes(x = BMI.level)) +
+geom_bar(aes(fill = color.name), position = "dodge") +
+scale_fill_discrete(name = "color") + ggtitle("Histogram Plot of BMI level counts through color")
+```
+
+We can see that the number of thin blue pokemons is the biggest among other thin pokemons. The number of strong grey pokemons is the biggest among other strong pokemons.
+
+**Generate a box plot of BMI through color.**
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ggplot(joindata2, aes(x = BMI, y = color.name)) + ylab("color") +
+geom_boxplot(aes(color = color.name)) + ggtitle("Box Plot of BMI level counts through color") + coord_flip()
+```
+
+All the distributions seem to be right-skewed, which means there exist outliers with huge BMIs, especially among black, blue, brown, grey, green and red pokemons. The pink polemons tend to be thin since none of them has a BMI greater than 10.
+
+The gray pokemons tend to have larger BMIs comparing to pokemons with other colors.
