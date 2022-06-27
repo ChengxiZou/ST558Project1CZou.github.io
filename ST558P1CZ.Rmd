@@ -28,7 +28,11 @@ No authentication is required to access this API, and all resources are fully op
 
 There are lots of data from the pokemon api, pokemons are species that helps you in a battle, and they can eat different kinds of berries to gain health, strength, etc.
 
-Let's grab some berry data by creating query functions using GET:
+Let's grab some berry data by creating query functions using GET.
+
+Notice that I use tolower(x) in the function. It convert letters to lower case so the path would be right even if users used upper case. This is good **use-ability**. If input ID numbers, it still works fine.
+
+There is no abbreviation of berries or pokemons, every one of them has a simple and unique ID and a name, so the tolower(x) function is all that I've done for the **use-ability**.
 
 ```{r, echo=TRUE}
 initialpath = "https://pokeapi.co/api/v2/berry/"
@@ -36,7 +40,7 @@ initialpath = "https://pokeapi.co/api/v2/berry/"
 # search berry data by typing name or id.
 # endpoint 1: berries
 getberrydata = function(x){
-  fullpath = paste(initialpath, x, sep = "")
+  fullpath = paste(initialpath, tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   berryinfo <- data.frame(berry.id = b$id,
@@ -93,7 +97,7 @@ Berry has its firmness: soft, hard, etc.
 # search berry firmness data by typing name or id.
 # endpoint 2: Berry Firmness
 getberryfirmdata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/berry-firmness/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/berry-firmness/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   berryinfo <- data.frame(firmness.id = b$id,
@@ -112,7 +116,7 @@ Berry has its flavor: sour, spicy, etc.
 # search berry flavor data by typing name or id.
 # endpoint 3: Berry Flavor
 getberryflavordata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/berry-flavor/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/berry-flavor/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   berryinfo <- data.frame(flavor.id = b$id,
@@ -133,7 +137,7 @@ Pokemon has its moves, which means different way to deal damage or affect target
 # search Moves
 # endpoint 4: Moves
 getmovedata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/move/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/move/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   moveinfo <- data.frame(move.id = b$id,
@@ -159,7 +163,7 @@ Moves would cause ailments, the buff that affect targets.
 # search Move Ailments
 # endpoint 5: Move Ailments
 getmadata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/move-ailment/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/move-ailment/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   mainfo <- data.frame(ailment.id = b$id,
@@ -180,7 +184,7 @@ Moves have categories.
 # search Move Categories
 # endpoint 6: Move Categories
 getmcdata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/move-category/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/move-category/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   mcinfo <- data.frame(category.id = b$id,
@@ -200,7 +204,7 @@ We can search pokemon data from this api, which is the most fun part to me.
 # search Pokemon
 # endpoint 7: Pokemon
 getpokemondata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/pokemon/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   pokemoninfo <- data.frame(pokemon.id = b$id,
@@ -223,7 +227,7 @@ Pokemons have colors.
 # search Pokemon Colors
 # endpoint 8: Pokemon Colors
 getpokemoncolordata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/pokemon-color/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon-color/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   pokemoncolorinfo <- data.frame(color.id = b$id,
@@ -242,7 +246,7 @@ There are different species of pokemon.
 # search Pokemon Species
 # endpoint 8: Pokemon Species
 getpokemonspeciesdata = function(x){
-  fullpath = paste("https://pokeapi.co/api/v2/pokemon-species/", x, sep = "")
+  fullpath = paste("https://pokeapi.co/api/v2/pokemon-species/", tolower(x), sep = "")
   a <- GET(fullpath)
   b <- fromJSON(rawToChar(a$content))
   pokemonspeciesinfo <- data.frame(species.id = b$id,
@@ -259,6 +263,32 @@ getpokemonspeciesdata = function(x){
   return(pokemonspeciesinfotbl)
 }
 ```
+
+**Now let's try to write an overall function that allow users to ask for info in a single function.**
+
+**Good User-ability!**
+
+Just type the endpoint and the ID or name then you get the data.
+
+```{r, echo=TRUE}
+GetPokemonApiData = function(endpoint, x){
+  endpoint2 <- tolower(endpoint)
+  switch(endpoint2,
+         "berry" = getberrydata(x),
+         "berry-firmness" = getberryfirmdata(x),
+         "berry-flavor" = getberryflavordata(x),
+         "move" = getmovedata(x),
+         "move-ailment" = getmadata(x),
+         "move-category" = getmcdata(x),
+         "pokemon" = getpokemondata(x),
+         "pokemon-color" = getpokemoncolordata(x)
+         )
+}
+
+GetPokemonApiData("Berry",1)
+# it works!
+```
+
 
 # A basic exploratory data analysis
 
