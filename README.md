@@ -22,6 +22,43 @@ on resources.
 No authentication is required to access this API, and all resources are
 fully open and available.
 
+There are lots of data from the pokemon api, pokemons are species that
+helps you in a battle, and they can eat different kinds of berries to
+gain health, strength, etc.
+
+Let’s grab some berry data by creating query functions using GET:
+
+``` r
+initialpath = "https://pokeapi.co/api/v2/berry/"
+
+# search berry data by typing name or id.
+# endpoint 1: berries
+getberrydata = function(x){
+  fullpath = paste(initialpath, x, sep = "")
+  a <- GET(fullpath)
+  b <- fromJSON(rawToChar(a$content))
+  berryinfo <- data.frame(berry.id = b$id,
+                          berry.name = b$name,
+                          max_harvest = b$max_harvest,
+                          growth_time = b$growth_time,
+                          power = b$natural_gift_power,
+                          size = b$size,
+                          smoothness = b$smoothness,
+                          soil_dryness = b$soil_dryness,
+                          firmness.name = b$firmness$name,
+                          flavor.name = b$flavors$flavor$name,
+                          item = b$item,
+                          natural_gift_power= b$natural_gift_power)
+berryinfotbl <- as_tibble(berryinfo)
+  return(berryinfotbl)
+}
+```
+
+`getberrydata` is a function which you can get berry data by simply
+typing the berry name or ID.
+
+Let’s take a look at combined berry data:
+
 ``` r
 # the tibble of all berry data
   allberry <- data.frame()
@@ -62,31 +99,12 @@ fully open and available.
     ## 10        2 chesto               5           3    60    80         25           15 super-hard    sour        chesto-berry https://pokeapi~
     ## # ... with 310 more rows, and 1 more variable: natural_gift_power <int>
 
+Berry has its firmness: soft, hard, etc.
+
+`getberryfirmdata` is a function which you can get berry firmness data
+by simply typing the berry name or ID.
+
 ``` r
-initialpath = "https://pokeapi.co/api/v2/berry/"
-
-# search berry data by typing name or id.
-# endpoint 1: berries
-getberrydata = function(x){
-  fullpath = paste(initialpath, x, sep = "")
-  a <- GET(fullpath)
-  b <- fromJSON(rawToChar(a$content))
-  berryinfo <- data.frame(berry.id = b$id,
-                          berry.name = b$name,
-                          max_harvest = b$max_harvest,
-                          growth_time = b$growth_time,
-                          power = b$natural_gift_power,
-                          size = b$size,
-                          smoothness = b$smoothness,
-                          soil_dryness = b$soil_dryness,
-                          firmness.name = b$firmness$name,
-                          flavor.name = b$flavors$flavor$name,
-                          item = b$item,
-                          natural_gift_power= b$natural_gift_power)
-berryinfotbl <- as_tibble(berryinfo)
-  return(berryinfotbl)
-}
-
 # search berry firmness data by typing name or id.
 # endpoint 2: Berry Firmness
 getberryfirmdata = function(x){
@@ -99,7 +117,14 @@ getberryfirmdata = function(x){
   berryinfotbl <- as_tibble(berryinfo)
   return(berryinfotbl)
 }
-  
+```
+
+Berry has its flavor: sour, spicy, etc.
+
+`getberryflavordata` is a function which you can get berry flavor data
+by simply typing the berry name or ID.
+
+``` r
 # search berry flavor data by typing name or id.
 # endpoint 3: Berry Flavor
 getberryflavordata = function(x){
@@ -114,8 +139,15 @@ getberryflavordata = function(x){
   berryinfotbl <- as_tibble(berryinfo)
   return(berryinfotbl)
 }
+```
 
+Pokemon has its moves, which means different way to deal damage or
+affect targets.
 
+`getmovedata` is a function which you can get moves data by simply
+typing the move name or ID.
+
+``` r
 # search Moves
 # endpoint 4: Moves
 getmovedata = function(x){
@@ -135,7 +167,14 @@ getmovedata = function(x){
   moveinfotbl <- as_tibble(moveinfo)
   return(moveinfotbl)
 }
+```
 
+Moves would cause ailments, the buff that affect targets.
+
+`getmadata` is a function which you can get move ailments data by simply
+typing the ailment’s name or ID.
+
+``` r
 # search Move Ailments
 # endpoint 5: Move Ailments
 getmadata = function(x){
@@ -149,7 +188,14 @@ getmadata = function(x){
   mainfotbl <- as_tibble(mainfo)
   return(mainfotbl)
 }
+```
 
+Moves have categories.
+
+`getmcdata` is a function which you can get category data by simply
+typing the category name or ID.
+
+``` r
 # search Move Categories
 # endpoint 6: Move Categories
 getmcdata = function(x){
@@ -163,7 +209,15 @@ getmcdata = function(x){
   mcinfotbl <- as_tibble(mcinfo)
   return(mcinfotbl)
 }
+```
 
+We can search pokemon data from this api, which is the most fun part to
+me.
+
+`getpokemondata` is a function which you can get pokemon data by simply
+typing the pokemon’s name or ID.
+
+``` r
 # search Pokemon
 # endpoint 7: Pokemon
 getpokemondata = function(x){
@@ -180,8 +234,14 @@ getpokemondata = function(x){
   pokemoninfotbl <- as_tibble(pokemoninfo)
   return(pokemoninfotbl)
 }
+```
 
+Pokemons have colors.
 
+`getpokemoncolordata` is a function which you can get color data by
+simply typing the color name or ID.
+
+``` r
 # search Pokemon Colors
 # endpoint 8: Pokemon Colors
 getpokemoncolordata = function(x){
@@ -194,7 +254,14 @@ getpokemoncolordata = function(x){
   pokemoncolorinfotbl <- as_tibble(pokemoncolorinfo)
   return(pokemoncolorinfotbl)
 }
+```
 
+There are different species of pokemon.
+
+`getpokemonspeciesdata` is a function which you can get species data by
+simply typing the species name or ID.
+
+``` r
 # search Pokemon Species
 # endpoint 8: Pokemon Species
 getpokemonspeciesdata = function(x){
@@ -552,7 +619,7 @@ geom_point(aes(color = color.name), position = "jitter") + scale_color_discrete(
   ggtitle("Jitter Plot of BMI level counts through color") + xlab("color")
 ```
 
-![](unnamed-chunk-436-1.png)<!-- -->
+![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 We can see that the majority of polemons have the BMI value under 10.
 There are no pink pokemon whose BMI is larger than 10.
@@ -568,7 +635,7 @@ geom_point(aes(color = factor(color.name))) + scale_color_discrete(name = "color
   ggtitle("Scatter plot of weight and height.") + geom_smooth(method = 'lm')
 ```
 
-![](unnamed-chunk-437-1.png)<!-- -->
+![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 In general, the pokemon with larger weight would have larger height, but
 there is no clear linear relationship between them since we could see
@@ -582,7 +649,7 @@ geom_point(aes(color = factor(color.name))) + scale_color_discrete(name = "color
   ggtitle("Scatter plot of height and BMI.") + geom_smooth(method = 'lm')
 ```
 
-![](unnamed-chunk-438-1.png)<!-- -->
+![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 Although the plot shows a down-ward linear regression model, there is
 absolutely no clear or convincing linear model to describe the
@@ -597,7 +664,7 @@ geom_bar(aes(fill = color.name), position = "dodge") +
 scale_fill_discrete(name = "color") + ggtitle("Histogram Plot of BMI level counts through color")
 ```
 
-![](unnamed-chunk-439-1.png)<!-- -->
+![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 We can see that the number of thin blue pokemons is the biggest among
 other thin pokemons. The number of strong grey pokemons is the biggest
@@ -610,7 +677,7 @@ ggplot(joindata2, aes(x = BMI, y = color.name)) + ylab("color") +
 geom_boxplot(aes(color = color.name)) + ggtitle("Box Plot of BMI level counts through color") + coord_flip()
 ```
 
-![](unnamed-chunk-440-1.png)<!-- -->
+![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 All the distributions seem to be right-skewed, which means there exist
 outliers with huge BMIs, especially among black, blue, brown, grey,
