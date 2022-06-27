@@ -256,7 +256,7 @@ arrangebmi <- joindata2 %>% arrange(desc(BMI))
 as.tibble(head(arrangebmi))
 ```
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 # this "cosmoem" has an extremly high BMI, better exclude it in order to do better analysis.
 joindata2 <- arrangebmi[-1,]
 
@@ -311,7 +311,7 @@ We can see that the majority of pokemons are light and short.
 
 **Summary of the joined data object.**
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 summary(joindata2)
 ```
 
@@ -321,7 +321,7 @@ There are pokemons weigh more than 9000, however if you look at the data, this s
 
 **Summary of BMI at each settings of color**
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 joindata2 %>% group_by(color.name) %>% summarise(Min = min(BMI), Median = median(BMI),
                                                  Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
 ```
@@ -334,7 +334,7 @@ Pink pokemons are the lightest polemons among all the other color.
 
 Let's see how BMI behaves at each settings of BMI level.
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 joindata2 %>% group_by(BMI.level) %>% summarise(Min = min(BMI), Median = median(BMI),
                                                  Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
 ```
@@ -345,7 +345,7 @@ The strong pokemons have the mean BMI of 10.81, while the thin pokemons have the
 
 Let's see how BMI behaves at each settings of height level.
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 joindata2 %>% group_by(height.level) %>% summarise(Min = min(BMI), Median = median(BMI),
                                                  Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
 ```
@@ -356,7 +356,7 @@ The short pokemons have the mean BMI of 4.13, while the tall pokemons have the m
 
 Let's see how BMI behaves at each settings of weight level.
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 joindata2 %>% group_by(weight.level) %>% summarise(Min = min(BMI), Median = median(BMI),
                                                  Mean = mean(BMI), Max = max(BMI), IQR = IQR(BMI))
 ```
@@ -367,7 +367,7 @@ The heavy pokemons have the mean BMI of 5.55, while the light pokemons have the 
 
 Let's see how weight behaves at each settings of BMI level.
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 joindata2 %>% group_by(BMI.level) %>% summarise(Min = min(pokemon.weight), Median = median(pokemon.weight),
                                                  Mean = mean(pokemon.weight), Max = max(pokemon.height), IQR = IQR(pokemon.weight))
 ```
@@ -378,7 +378,7 @@ The strong pokemons have the mean weight of 1176.32, while the thin pokemons hav
 
 **Generate a jitter plot of BMI level counts through color.**
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(joindata2, aes(x = color.name, BMI)) +
 geom_point(aes(color = color.name), position = "jitter") + scale_color_discrete(name = "color") +
   ggtitle("Jitter Plot of BMI level counts through color") + xlab("color")
@@ -410,7 +410,7 @@ Although the plot shows a down-ward linear regression model, there is absolutely
 
 **Generate a histogram of BMI level counts through color.**
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(joindata2, aes(x = BMI.level)) +
 geom_bar(aes(fill = color.name), position = "dodge") +
 scale_fill_discrete(name = "color") + ggtitle("Histogram Plot of BMI level counts through color")
@@ -420,7 +420,7 @@ We can see that the number of thin blue pokemons is the biggest among other thin
 
 **Generate a box plot of BMI through color.**
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(joindata2, aes(x = BMI, y = color.name)) + ylab("color") +
 geom_boxplot(aes(color = color.name)) + ggtitle("Box Plot of BMI level counts through color") + coord_flip()
 ```
