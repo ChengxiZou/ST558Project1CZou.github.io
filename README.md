@@ -666,7 +666,14 @@ geom_point(aes(color = color.name), position = "jitter") + scale_color_discrete(
   ggtitle("Jitter Plot of BMI level counts through color") + xlab("color")
 ```
 
+<<<<<<< HEAD
 ![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+=======
+
+
+![](unnamed-chunk-436-1.png)<!-- -->
+
+>>>>>>> 395d03e8bb82c02e03c53f93a85260d439c14f35
 
 We can see that the majority of pokemons have the BMI value under 10.
 There are no pink pokemon whose BMI is larger than 10.
@@ -682,7 +689,14 @@ geom_point(aes(color = factor(color.name))) + scale_color_discrete(name = "color
   ggtitle("Scatter plot of weight and height.") + geom_smooth(method = 'lm')
 ```
 
+<<<<<<< HEAD
 ![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+=======
+
+
+![](unnamed-chunk-437-1.png)<!-- -->
+
+>>>>>>> 395d03e8bb82c02e03c53f93a85260d439c14f35
 
 In general, the pokemon with larger weight would have larger height, but
 there is no clear linear relationship between them since we could see
@@ -696,7 +710,13 @@ geom_point(aes(color = factor(color.name))) + scale_color_discrete(name = "color
   ggtitle("Scatter plot of height and BMI.") + geom_smooth(method = 'lm')
 ```
 
+<<<<<<< HEAD
 ![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+=======
+
+![](unnamed-chunk-438-1.png)<!-- -->
+
+>>>>>>> 395d03e8bb82c02e03c53f93a85260d439c14f35
 
 Although the plot shows a down-ward linear regression model, there is
 absolutely no clear or convincing linear model to describe the
@@ -711,7 +731,13 @@ geom_bar(aes(fill = color.name), position = "dodge") +
 scale_fill_discrete(name = "color") + ggtitle("Histogram Plot of BMI level counts through color")
 ```
 
+<<<<<<< HEAD
 ![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+=======
+
+![](unnamed-chunk-439-1.png)<!-- -->
+
+>>>>>>> 395d03e8bb82c02e03c53f93a85260d439c14f35
 
 We can see that the number of thin blue pokemons is the biggest among
 other thin pokemons. The number of strong grey pokemons is the biggest
@@ -724,7 +750,13 @@ ggplot(joindata2, aes(x = BMI, y = color.name)) + ylab("color") +
 geom_boxplot(aes(color = color.name)) + ggtitle("Box Plot of BMI level counts through color") + coord_flip()
 ```
 
+<<<<<<< HEAD
 ![](D:\5th%20semester\ST558\Rrepo\ST558Project1CZou.github.io\README_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+=======
+
+![](unnamed-chunk-440-1.png)<!-- -->
+
+>>>>>>> 395d03e8bb82c02e03c53f93a85260d439c14f35
 
 All the distributions seem to be right-skewed, which means there exist
 outliers with huge BMIs, especially among black, blue, brown, grey,
